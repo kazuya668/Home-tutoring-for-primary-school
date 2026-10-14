@@ -1,0 +1,1632 @@
+```html
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>数学大冒险 · 华小数学</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;overflow:hidden}
+body{
+font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC",system-ui,-apple-system,sans-serif;
+background:#1b1464;color:#fff;
+}
+#app{
+position:fixed;inset:0;display:flex;flex-direction:column;overflow:hidden;
+background:
+radial-gradient(circle at 15% 0%,rgba(123,77,255,.9),transparent 55%),
+radial-gradient(circle at 90% 100%,rgba(255,92,138,.75),transparent 50%),
+linear-gradient(160deg,#1b1464,#3a1f8f 55%,#5b2fd1);
+}
+#app::before{
+content:"";position:absolute;inset:0;pointer-events:none;opacity:.35;
+background-image:radial-gradient(#fff 1px,transparent 1px);
+background-size:44px 44px;
+}
+.screen{position:relative;flex:1;display:flex;flex-direction:column;min-height:0;padding:16px;gap:14px;overflow-y:auto;-webkit-overflow-scrolling:touch}
+
+/* ---------- 主页 ---------- */
+.home{align-items:center;justify-content:center;text-align:center}
+.mascot{font-size:72px;animation:bob 2.2s ease-in-out infinite;filter:drop-shadow(0 8px 16px rgba(0,0,0,.35))}
+@keyframes bob{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-14px) rotate(4deg)}}
+.title{
+margin:0;font-size:clamp(30px,8vw,46px);font-weight:900;letter-spacing:2px;
+background:linear-gradient(180deg,#fff,#ffd166);
+-webkit-background-clip:text;background-clip:text;color:transparent;
+text-shadow:0 4px 0 rgba(0,0,0,.15);
+}
+.subtitle{margin:0;opacity:.85;font-size:15px;letter-spacing:1px}
+.grade-cards{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;margin-top:14px;width:100%;max-width:520px}
+.grade-card{
+flex:1 1 190px;min-width:160px;border:none;cursor:pointer;font-family:inherit;
+border-radius:26px;padding:22px 16px;color:#1b1464;
+display:flex;flex-direction:column;align-items:center;gap:6px;
+box-shadow:0 8px 0 rgba(0,0,0,.22),0 14px 30px rgba(0,0,0,.25);
+transition:transform .15s,box-shadow .15s;
+}
+.grade-card:active{transform:translateY(5px);box-shadow:0 3px 0 rgba(0,0,0,.22)}
+.g1{background:linear-gradient(160deg,#fff5b8,#ffd166)}
+.g3{background:linear-gradient(160deg,#c8f7dc,#63d9a5)}
+.gc-icon{font-size:38px}
+.gc-name{font-size:26px;font-weight:900}
+.gc-desc{font-size:13px;opacity:.7;font-weight:600}
+
+/* ---------- 顶栏 ---------- */
+.topbar{display:flex;align-items:center;gap:12px;flex-shrink:0}
+.icon-btn{
+width:46px;height:46px;flex-shrink:0;border:none;border-radius:16px;cursor:pointer;
+background:rgba(255,255,255,.18);color:#fff;font-size:22px;font-family:inherit;
+display:flex;align-items:center;justify-content:center;
+backdrop-filter:blur(6px);transition:background .15s,transform .1s;
+}
+.icon-btn:active{transform:scale(.93);background:rgba(255,255,255,.3)}
+.topbar-title{flex:1;text-align:center;font-weight:800;font-size:17px;letter-spacing:.5px}
+.progress-wrap{flex:1;display:flex;flex-direction:column;gap:5px}
+.progress{height:12px;border-radius:99px;background:rgba(0,0,0,.28);overflow:hidden}
+.progress-fill{height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,#ffd166,#ff8fab);transition:width .35s ease}
+.progress-text{font-size:11px;opacity:.75;text-align:center;font-weight:700}
+.score-badge{
+background:rgba(255,209,102,.22);border:2px solid rgba(255,209,102,.55);
+padding:8px 14px;border-radius:99px;font-weight:900;font-size:15px;white-space:nowrap;
+}
+
+/* ---------- 主题选择 ---------- */
+.topic-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;padding-bottom:24px}
+.topic-card{
+border:none;cursor:pointer;font-family:inherit;text-align:left;
+background:rgba(255,255,255,.13);border:2px solid rgba(255,255,255,.16);
+border-radius:20px;padding:16px 14px;color:#fff;
+display:flex;flex-direction:column;gap:6px;
+transition:transform .12s,background .15s,border-color .15s;
+backdrop-filter:blur(6px);
+}
+.topic-card:active{transform:scale(.95)}
+.topic-card:hover{background:rgba(255,255,255,.22);border-color:rgba(255,209,102,.6)}
+.tc-icon{font-size:30px}
+.tc-name{font-size:16px;font-weight:900}
+.tc-desc{font-size:11px;opacity:.7;font-weight:600;line-height:1.35}
+
+/* ---------- 游戏区 ---------- */
+.play{padding:12px 14px 18px;gap:12px}
+.qarea{flex:1;display:flex;flex-direction:column;gap:12px;min-height:0}
+.qcard{
+background:#fff;color:#1b1464;border-radius:24px;padding:20px 18px;
+box-shadow:0 10px 0 rgba(0,0,0,.2),0 18px 34px rgba(0,0,0,.25);
+display:flex;flex-direction:column;gap:14px;align-items:center;
+flex-shrink:0;
+}
+.qtext{font-size:clamp(18px,4.6vw,23px);font-weight:800;line-height:1.5;text-align:center}
+.qvisual{display:flex;justify-content:center;width:100%}
+.pop{animation:popIn .32s cubic-bezier(.34,1.56,.64,1)}
+@keyframes popIn{0%{transform:scale(.86);opacity:0}100%{transform:scale(1);opacity:1}}
+
+.emoji-grid{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;font-size:clamp(24px,6vw,32px);max-width:420px;line-height:1.1}
+.seq{font-size:clamp(22px,6vw,32px);font-weight:900;letter-spacing:3px;color:#4a2fbd}
+.blank{color:#ff5c8a;animation:blink 1s infinite}
+@keyframes blink{50%{opacity:.35}}
+.clock{width:clamp(130px,34vw,170px);height:clamp(130px,34vw,170px)}
+.shape-svg{width:clamp(100px,26vw,140px);height:clamp(100px,26vw,140px)}
+
+.frac-bar{display:flex;width:min(300px,80vw);height:74px;border-radius:14px;overflow:hidden;border:4px solid #4a2fbd;background:#fff}
+.frac-bar .seg{flex:1;background:#f0f0f8}
+.frac-bar .seg.filled{background:linear-gradient(160deg,#ffd166,#ff9f1c)}
+.frac-bar .seg + .seg{border-left:3px solid #4a2fbd}
+
+.bars{display:flex;flex-direction:column;gap:12px;width:min(340px,86vw)}
+.bar-row{display:flex;align-items:center;gap:10px}
+.bl{font-weight:900;font-size:18px;color:#4a2fbd;width:22px}
+.bar{height:26px;border-radius:8px;background:linear-gradient(90deg,#8ecae6,#219ebc);min-width:20px}
+
+.glasses{display:flex;gap:26px;align-items:flex-end}
+.glass{width:54px;height:90px;border:4px solid #4a2fbd;border-top:none;border-radius:0 0 16px 16px;display:flex;align-items:flex-end;overflow:hidden;background:#fff;position:relative}
+.glass .water{width:100%;background:linear-gradient(180deg,#48cae4,#0077b6);transition:height .3s}
+.glass-label{position:absolute;bottom:-24px;left:50%;transform:translateX(-50%);font-weight:900;color:#4a2fbd;font-size:15px}
+
+.picto{display:flex;flex-direction:column;gap:10px;width:min(340px,86vw)}
+.picto-row{display:flex;align-items:center;gap:10px;background:#f6f4ff;border-radius:12px;padding:8px 12px}
+.picto-label{font-size:13px;font-weight:900;color:#4a2fbd;width:56px;flex-shrink:0}
+.picto-icons{font-size:22px;letter-spacing:1px;line-height:1}
+.picto-note{font-size:12px;font-weight:700;color:#ff5c8a;text-align:center;margin-top:2px}
+
+.options{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-top:auto}
+.opt{
+display:flex;align-items:center;gap:10px;min-height:66px;
+background:#fff;color:#1b1464;border:none;border-radius:18px;padding:14px 14px;
+font-size:clamp(17px,4.4vw,21px);font-weight:900;font-family:inherit;cursor:pointer;
+box-shadow:0 6px 0 rgba(0,0,0,.25);
+transition:transform .1s,box-shadow .1s,background .15s;
+animation:optIn .3s backwards;
+}
+@keyframes optIn{0%{transform:translateY(14px) scale(.94);opacity:0}100%{transform:none;opacity:1}}
+.opt:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.25)}
+.opt-key{
+flex-shrink:0;width:30px;height:30px;border-radius:10px;background:#eee9ff;color:#5b2fd1;
+display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:900;
+}
+.opt.correct{background:linear-gradient(160deg,#7bed9f,#2ed573);color:#04471f;box-shadow:0 6px 0 #1e9e4f}
+.opt.correct .opt-key{background:rgba(255,255,255,.6);color:#04471f}
+.opt.wrong{background:linear-gradient(160deg,#ff9a9a,#ff4757);color:#fff;box-shadow:0 6px 0 #b31b28;animation:shake .4s}
+.opt.wrong .opt-key{background:rgba(255,255,255,.3);color:#fff}
+.opt.disabled{pointer-events:none}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-9px)}40%{transform:translateX(9px)}60%{transform:translateX(-6px)}80%{transform:translateX(6px)}}
+
+.hint-box{
+background:rgba(255,209,102,.16);border:2px solid rgba(255,209,102,.5);
+border-radius:16px;padding:12px 16px;font-size:14px;font-weight:700;line-height:1.5;
+animation:popIn .3s;flex-shrink:0;
+}
+.continue-btn{
+width:100%;border:none;border-radius:18px;padding:16px;margin-top:10px;
+background:linear-gradient(160deg,#ffd166,#ff9f1c);color:#4a2200;
+font-size:19px;font-weight:900;font-family:inherit;cursor:pointer;
+box-shadow:0 6px 0 #c97a00;animation:popIn .3s;
+}
+.continue-btn:active{transform:translateY(4px);box-shadow:0 2px 0 #c97a00}
+
+/* ---------- 结果 ---------- */
+.result{align-items:center;justify-content:center;text-align:center;gap:10px}
+.result-emoji{font-size:78px;animation:bob 2s infinite}
+.result-title{font-size:32px;font-weight:900;margin:0}
+.stars{font-size:46px;letter-spacing:6px;animation:popIn .5s}
+.stars .off{opacity:.22}
+.stat-row{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin-top:6px}
+.stat{background:rgba(255,255,255,.14);border-radius:18px;padding:14px 22px;min-width:104px;border:2px solid rgba(255,255,255,.15)}
+.stat-num{font-size:26px;font-weight:900;color:#ffd166}
+.stat-lbl{font-size:12px;opacity:.8;font-weight:700;margin-top:2px}
+.btn-row{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:18px}
+.big-btn{
+border:none;border-radius:20px;padding:16px 30px;font-size:18px;font-weight:900;font-family:inherit;cursor:pointer;
+box-shadow:0 6px 0 rgba(0,0,0,.25);transition:transform .1s;
+}
+.big-btn:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.25)}
+.big-btn.primary{background:linear-gradient(160deg,#ffd166,#ff9f1c);color:#4a2200;box-shadow:0 6px 0 #c97a00}
+.big-btn.ghost{background:rgba(255,255,255,.18);color:#fff;border:2px solid rgba(255,255,255,.3)}
+
+/* ---------- 特效 ---------- */
+.confetti{position:fixed;width:11px;height:11px;border-radius:3px;pointer-events:none;z-index:9999;animation:confettiFly .95s ease-out forwards}
+@keyframes confettiFly{
+0%{transform:translate(-50%,-50%) scale(1) rotate(0);opacity:1}
+100%{transform:translate(calc(-50% + var(--tx)),calc(-50% + var(--ty))) scale(.25) rotate(var(--rot));opacity:0}
+}
+.toast{
+position:fixed;left:50%;top:16%;transform:translateX(-50%);
+background:rgba(255,255,255,.97);color:#1b1464;padding:13px 26px;border-radius:999px;
+font-weight:900;font-size:18px;z-index:9998;pointer-events:none;
+box-shadow:0 10px 28px rgba(0,0,0,.35);white-space:nowrap;
+animation:toastPop 1.4s ease forwards;
+}
+@keyframes toastPop{
+0%{opacity:0;transform:translateX(-50%) scale(.6)}
+15%{opacity:1;transform:translateX(-50%) scale(1.06)}
+25%{transform:translateX(-50%) scale(1)}
+78%{opacity:1;transform:translateX(-50%) scale(1)}
+100%{opacity:0;transform:translateX(-50%) translateY(-24px) scale(.95)}
+}
+
+@media (max-width:420px){
+.options{grid-template-columns:1fr}
+.opt{min-height:56px}
+.topic-grid{grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px}
+}
+@media (min-width:760px){
+.screen{padding:22px 32px;max-width:820px;margin:0 auto;width:100%}
+.qcard{padding:28px 26px}
+}
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+/* =========================================================
+数学大冒险 — 华小数学游戏 (Standard 1 & 3)
+========================================================= */
+
+/* ---------------- 工具函数 ---------------- */
+const rnd = (a, b) => Math.floor(Math.random() * (b - a + 1)) + a;
+const pick = a => a[Math.floor(Math.random() * a.length)];
+function shuffle(arr) {
+const a = arr.slice();
+for (let i = a.length - 1; i > 0; i--) {
+const j = Math.floor(Math.random() * (i + 1));
+[a[i], a[j]] = [a[j], a[i]];
+}
+return a;
+}
+function numChoices(ans, n = 4, delta = 10) {
+const set = new Set([ans]);
+let guard = 0;
+while (set.size < n && guard++ < 200) {
+const d = rnd(1, delta);
+const v = ans + (Math.random() < 0.5 ? -d : d);
+if (v >= 0) set.add(v);
+}
+let v = ans + 1;
+while (set.size < n) { set.add(v); v++; }
+return shuffle([...set]);
+}
+function mixOptions(correct, pool, n = 4) {
+const opts = [String(correct)];
+for (const p of shuffle(pool.map(String))) {
+if (opts.length >= n) break;
+if (!opts.includes(p)) opts.push(p);
+}
+let guard = 0;
+while (opts.length < n && guard++ < 60) {
+const v = String(rnd(1, 99));
+if (!opts.includes(v)) opts.push(v);
+}
+return shuffle(opts);
+}
+function decChoices(ansTenths, n = 4, delta = 15) {
+const set = new Set([ansTenths]);
+let guard = 0;
+while (set.size < n && guard++ < 200) {
+const d = rnd(1, delta);
+const v = ansTenths + (Math.random() < 0.5 ? -d : d);
+if (v > 0) set.add(v);
+}
+let v = ansTenths + 1;
+while (set.size < n) { set.add(v); v++; }
+return shuffle([...set]).map(x => (x / 10).toFixed(1));
+}
+const rm = c => 'RM' + (c / 100).toFixed(2);
+function moneyChoices(ansCents, n = 4, delta = 250) {
+const set = new Set([ansCents]);
+let guard = 0;
+while (set.size < n && guard++ < 200) {
+const d = rnd(1, Math.max(1, Math.ceil(delta / 10))) * 10;
+const v = ansCents + (Math.random() < 0.5 ? -d : d);
+if (v > 0) set.add(v);
+}
+let v = ansCents + 10;
+while (set.size < n) { set.add(v); v += 10; }
+return shuffle([...set]).map(rm);
+}
+function cnNum(n) {
+const d = ['零','一','二','三','四','五','六','七','八','九'];
+if (n < 10) return d[n];
+if (n === 10) return '十';
+if (n < 20) return '十' + d[n % 10];
+if (n < 100) {
+const t = Math.floor(n / 10), o = n % 10;
+return d[t] + '十' + (o ? d[o] : '');
+}
+return String(n);
+}
+function cnNumBig(n) {
+const d = ['零','一','二','三','四','五','六','七','八','九'];
+if (n < 10) return d[n];
+if (n < 100) {
+const t = Math.floor(n / 10), o = n % 10;
+if (t === 1) return '十' + (o ? d[o] : '');
+return d[t] + '十' + (o ? d[o] : '');
+}
+if (n < 1000) {
+const h = Math.floor(n / 100), r = n % 100;
+let s = d[h] + '百';
+if (r === 0) return s;
+if (r < 10) return s + '零' + d[r];
+return s + cnNumBig(r);
+}
+const th = Math.floor(n / 1000), r = n % 1000;
+let s = d[th] + '千';
+if (r === 0) return s;
+if (r < 100) return s + '零' + cnNumBig(r);
+return s + cnNumBig(r);
+}
+function clockSVG(h, m) {
+const cx = 100, cy = 100;
+const hAng = ((h % 12) + m / 60) * 30 - 90;
+const mAng = m * 6 - 90;
+const hx = cx + 44 * Math.cos(hAng * Math.PI / 180);
+const hy = cy + 44 * Math.sin(hAng * Math.PI / 180);
+const mx = cx + 66 * Math.cos(mAng * Math.PI / 180);
+const my = cy + 66 * Math.sin(mAng * Math.PI / 180);
+let ticks = '';
+for (let i = 0; i < 12; i++) {
+const a = (i * 30 - 90) * Math.PI / 180;
+const x1 = cx + 78 * Math.cos(a), y1 = cy + 78 * Math.sin(a);
+const x2 = cx + 86 * Math.cos(a), y2 = cy + 86 * Math.sin(a);
+ticks += `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="#4a2fbd" stroke-width="4" stroke-linecap="round"/>`;
+}
+return `<svg viewBox="0 0 200 200" class="clock">
+<circle cx="100" cy="100" r="94" fill="#fff" stroke="#4a2fbd" stroke-width="8"/>
+${ticks}
+<line x1="100" y1="100" x2="${hx.toFixed(1)}" y2="${hy.toFixed(1)}" stroke="#1b1464" stroke-width="9" stroke-linecap="round"/>
+<line x1="100" y1="100" x2="${mx.toFixed(1)}" y2="${my.toFixed(1)}" stroke="#ff5c8a" stroke-width="6" stroke-linecap="round"/>
+<circle cx="100" cy="100" r="8" fill="#1b1464"/>
+</svg>`;
+}
+
+/* =========================================================
+一年级 题目生成器
+========================================================= */
+const EMOJIS = ['🍎','⭐','🐟','🌸','🚗','🐝','🍩','⚽','🐰','🍇','🎈','🐢'];
+
+function gen1Num() {
+const t = pick(['count','count','seq','compare','word']);
+if (t === 'count') {
+const n = rnd(6, 20);
+const e = pick(EMOJIS);
+let vis = '';
+for (let i = 0; i < n; i++) vis += e;
+return {
+q: `数一数，一共有几个 ${e} ？`,
+visual: `<div class="emoji-grid">${vis}</div>`,
+options: numChoices(n, 4, 4).map(String),
+answer: String(n),
+hint: '一个一个慢慢数，不要跳哦～'
+};
+}
+if (t === 'seq') {
+const start = rnd(1, 70);
+const hide = pick([1, 2]);
+const arr = [start, start + 1, start + 2, start + 3];
+const ans = arr[hide];
+const disp = arr.map((v, i) => i === hide ? '<span class="blank">?</span>' : v).join(' → ');
+return {
+q: '按顺序填一填，问号是几？',
+visual: `<div class="seq">${disp}</div>`,
+options: numChoices(ans, 4, 3).map(String),
+answer: String(ans),
+hint: '后面的数比前面多 1。'
+};
+}
+if (t === 'compare') {
+const pool = [];
+while (pool.length < 3) { const v = rnd(1, 100); if (!pool.includes(v)) pool.push(v); }
+const max = Math.max(...pool);
+return {
+q: '下面哪个数最大？',
+options: pool.map(String),
+answer: String(max),
+hint: '先比十位，十位大的数就大。'
+};
+}
+const n = rnd(11, 99);
+return {
+q: `“${cnNum(n)}”是下面哪个数字？`,
+options: numChoices(n, 4, 9).map(String),
+answer: String(n),
+hint: '十位读作「几」十，个位读作「几」。'
+};
+}
+
+function gen1AddSub() {
+const t = pick(['add','add','sub','sub','wordadd','wordsub']);
+if (t === 'add') {
+const a = rnd(5, 50);
+const b = rnd(2, Math.min(48, 99 - a));
+const ans = a + b;
+return { q: `${a} + ${b} = ?`, options: numChoices(ans, 4, 8).map(String), answer: String(ans), hint: '先加个位，再加十位。' };
+}
+if (t === 'sub') {
+const a = rnd(20, 99);
+const b = rnd(2, a - 5);
+const ans = a - b;
+return { q: `${a} − ${b} = ?`, options: numChoices(ans, 4, 8).map(String), answer: String(ans), hint: '先减个位，不够就向十位借 1。' };
+}
+if (t === 'wordadd') {
+const a = rnd(10, 60);
+const b = rnd(5, Math.max(6, 99 - a));
+const ans = a + b;
+return {
+q: `小明有 ${a} 颗糖果，妈妈又给了他 ${b} 颗。现在他一共有多少颗糖果？`,
+options: numChoices(ans, 4, 8).map(String), answer: String(ans),
+hint: '「又给了他」表示变多了，用加法。'
+};
+}
+const a = rnd(20, 99);
+const b = rnd(5, a - 5);
+const ans = a - b;
+return {
+q: `树上原来有 ${a} 只小鸟，飞走了 ${b} 只。树上还剩多少只小鸟？`,
+options: numChoices(ans, 4, 8).map(String), answer: String(ans),
+hint: '「飞走了」表示变少了，用减法。'
+};
+}
+
+function gen1Mul() {
+const tables = [2, 3, 4, 5, 10];
+const a = pick(tables);
+const b = rnd(1, 9);
+const ans = a * b;
+const t = pick(['mul','mul','repeat','word']);
+if (t === 'mul') {
+return { q: `${a} × ${b} = ?`, options: numChoices(ans, 4, 6).map(String), answer: String(ans), hint: `想一想 ${a} 的乘法口诀。` };
+}
+if (t === 'repeat') {
+const parts = Array(b).fill(a).join(' + ');
+const correct = `${a} × ${b}`;
+const pool = [`${a} × ${a}`, `${b} × ${b}`, `${a} + ${b}`, `${b} × ${a}`];
+return {
+q: `${parts} 可以写成下面哪一个乘法算式？`,
+visual: `<div class="seq">${parts}</div>`,
+options: mixOptions(correct, pool, 4),
+answer: correct,
+hint: `有 ${b} 个 ${a} 相加，就是 ${a} × ${b}。`
+};
+}
+return {
+q: `每盒有 ${a} 粒糖，${b} 盒一共有多少粒糖？`,
+options: numChoices(ans, 4, 6).map(String), answer: String(ans),
+hint: '每盒一样多，用乘法。'
+};
+}
+
+function gen1Frac() {
+const cases = [
+{ parts: 2, filled: 1, ans: '1/2' },
+{ parts: 4, filled: 1, ans: '1/4' },
+{ parts: 4, filled: 2, ans: '2/4' },
+{ parts: 4, filled: 3, ans: '3/4' }
+];
+const c = pick(cases);
+let segs = '';
+for (let i = 0; i < c.parts; i++) segs += `<div class="seg${i < c.filled ? ' filled' : ''}"></div>`;
+const all = ['1/2', '1/4', '2/4', '3/4'];
+const opts = [c.ans];
+for (const x of shuffle(all)) { if (opts.length >= 4) break; if (!opts.includes(x)) opts.push(x); }
+return {
+q: '涂色的部分是几分之几？',
+visual: `<div class="frac-bar">${segs}</div>`,
+options: shuffle(opts),
+answer: c.ans,
+hint: '把整体平均分成几份，涂色的就是几分之几。'
+};
+}
+
+function gen1Money() {
+const t = pick(['sen','sen','rm','rm','word']);
+if (t === 'sen') {
+const a = rnd(1, 5) * 10;
+const b = rnd(1, 5) * 10;
+if (a + b > 100) return gen1Money();
+const ans = a + b;
+return {
+q: `${a} 仙 + ${b} 仙 = ? 仙`,
+options: numChoices(ans, 4, 10).map(v => v + ' 仙'),
+answer: ans + ' 仙',
+hint: '把仙的数目加起来就好。'
+};
+}
+if (t === 'rm') {
+const a = rnd(1, 15);
+const b = rnd(1, Math.min(15, 25 - a));
+const ans = a + b;
+return {
+q: `RM${a} + RM${b} = ?`,
+options: numChoices(ans, 4, 4).map(v => 'RM' + v),
+answer: 'RM' + ans,
+hint: '令吉的数目直接相加。'
+};
+}
+if (Math.random() < 0.5) {
+const p1 = rnd(1, 5), p2 = rnd(1, 5);
+const ans = p1 + p2;
+return {
+q: `一个橡皮擦 RM${p1}，一支铅笔 RM${p2}。一共要多少钱？`,
+options: numChoices(ans, 4, 3).map(v => 'RM' + v),
+answer: 'RM' + ans,
+hint: '一共就是加起来。'
+};
+}
+const pay = pick([5, 10, 20]);
+const cost = rnd(1, pay - 1);
+const ans = pay - cost;
+return {
+q: `小明给了 RM${pay}，买了一个 RM${cost} 的面包。应该找回多少钱？`,
+options: numChoices(ans, 4, 3).map(v => 'RM' + v),
+answer: 'RM' + ans,
+hint: '找回的钱 = 给的钱 − 用的钱。'
+};
+}
+
+function gen1Time() {
+const t = pick(['clock','clock','clock','clock','days']);
+if (t === 'clock') {
+const h = rnd(1, 12);
+const isHalf = Math.random() < 0.5;
+const m = isHalf ? 30 : 0;
+const ansStr = `${h}:${isHalf ? '30' : '00'}`;
+const set = new Set([`${h}:00`, `${h}:30`]);
+let hh = h;
+let guard = 0;
+while (set.size < 4 && guard++ < 40) {
+hh = hh % 12 + 1;
+set.add(`${hh}:00`);
+if (set.size < 4) set.add(`${hh}:30`);
+}
+return {
+q: '钟表上显示的是几点？',
+visual: clockSVG(h, m),
+options: shuffle([...set]),
+answer: ansStr,
+hint: '短针是时针，长针是分针。长针指向 12 是整点，指向 6 是半点。'
+};
+}
+const qs = [
+{ q: '一星期有几天？', a: '7 天', pool: ['5 天', '6 天', '10 天'] },
+{ q: '一年有几个月？', a: '12 个月', pool: ['10 个月', '11 个月', '24 个月'] },
+{ q: '1 小时有多少分钟？', a: '60 分钟', pool: ['30 分钟', '45 分钟', '100 分钟'] },
+{ q: '1 分钟有多少秒？', a: '60 秒', pool: ['30 秒', '50 秒', '100 秒'] }
+];
+const item = pick(qs);
+return {
+q: item.q,
+options: shuffle([item.a, ...item.pool]),
+answer: item.a,
+hint: '想一想我们平时用的时间单位。'
+};
+}
+
+function gen1Measure() {
+const t = pick(['length','length','volume','mass']);
+if (t === 'length') {
+const widths = shuffle([rnd(30, 55), rnd(60, 78), rnd(82, 98)]);
+const labels = ['A', 'B', 'C'];
+const rows = labels.map((l, i) =>
+`<div class="bar-row"><span class="bl">${l}</span><div class="bar" style="width:${widths[i]}%"></div></div>`
+).join('');
+const askLongest = Math.random() < 0.5;
+const maxI = widths.indexOf(Math.max(...widths));
+const minI = widths.indexOf(Math.min(...widths));
+const ans = askLongest ? labels[maxI] : labels[minI];
+return {
+q: askLongest ? '哪一条绳子最长？' : '哪一条绳子最短？',
+visual: `<div class="bars">${rows}</div>`,
+options: shuffle(labels.slice()),
+answer: ans,
+hint: '看看哪一条占的位置最多。'
+};
+}
+if (t === 'volume') {
+const hs = shuffle([rnd(25, 45), rnd(55, 72), rnd(80, 95)]);
+const labels = ['A', 'B', 'C'];
+const glasses = labels.map((l, i) =>
+`<div class="glass"><div class="water" style="height:${hs[i]}%"></div><span class="glass-label">${l}</span></div>`
+).join('');
+const askMost = Math.random() < 0.5;
+const maxI = hs.indexOf(Math.max(...hs));
+const minI = hs.indexOf(Math.min(...hs));
+const ans = askMost ? labels[maxI] : labels[minI];
+return {
+q: askMost ? '哪一个杯子的水最多？' : '哪一个杯子的水最少？',
+visual: `<div class="glasses">${glasses}</div>`,
+options: shuffle(labels.slice()),
+answer: ans,
+hint: '水位越高，水就越多。'
+};
+}
+const items = [
+{ e: '🍉 西瓜', w: 100 },
+{ e: '🍎 苹果', w: 20 },
+{ e: '🍇 葡萄', w: 5 }
+];
+const sorted = items.slice().sort((a, b) => b.w - a.w);
+const askHeavy = Math.random() < 0.5;
+const ans = askHeavy ? sorted[0].e : sorted[sorted.length - 1].e;
+return {
+q: askHeavy ? '下面哪一个最重？' : '下面哪一个最轻？',
+visual: `<div class="emoji-grid" style="font-size:34px">${items.map(i => i.e).join(' &nbsp; ')}</div>`,
+options: shuffle(items.map(i => i.e)),
+answer: ans,
+hint: '想一想平时拿起来的感觉。'
+};
+}
+
+function gen1Shape() {
+const shapes = {
+'圆形': `<circle cx="50" cy="50" r="42" fill="#ffd166" stroke="#e08b00" stroke-width="4"/>`,
+'正方形': `<rect x="10" y="10" width="80" height="80" rx="6" fill="#8ecae6" stroke="#0077b6" stroke-width="4"/>`,
+'长方形': `<rect x="7" y="26" width="86" height="48" rx="6" fill="#b5e48c" stroke="#3a7d1e" stroke-width="4"/>`,
+'三角形': `<polygon points="50,8 92,90 8,90" fill="#ffb4a2" stroke="#c1121f" stroke-width="4"/>`
+};
+const names = Object.keys(shapes);
+const name = pick(names);
+return {
+q: '这是什么图形？',
+visual: `<svg viewBox="0 0 100 100" class="shape-svg">${shapes[name]}</svg>`,
+options: shuffle(names.slice()),
+answer: name,
+hint: '看看它有几条边、几个角。'
+};
+}
+
+function gen1Data() {
+const fruits = shuffle([
+{ e: '🍎', name: '苹果', n: rnd(2, 6) },
+{ e: '🍌', name: '香蕉', n: rnd(2, 6) },
+{ e: '🍇', name: '葡萄', n: rnd(2, 6) }
+]);
+const rows = fruits.map(f =>
+`<div class="picto-row"><span class="picto-label">${f.name}</span><span class="picto-icons">${f.e.repeat(f.n)}</span></div>`
+).join('');
+const t = pick(['count','most','least']);
+if (t === 'count') {
+const f = pick(fruits);
+return {
+q: `${f.name}有几个？`,
+visual: `<div class="picto">${rows}</div>`,
+options: numChoices(f.n, 4, 3).map(String),
+answer: String(f.n),
+hint: '数一数那一行的图案有几个。'
+};
+}
+const sorted = fruits.slice().sort((a, b) => b.n - a.n);
+const askMost = t === 'most';
+const ans = askMost ? sorted[0].name : sorted[sorted.length - 1].name;
+return {
+q: askMost ? '哪一种水果最多？' : '哪一种水果最少？',
+visual: `<div class="picto">${rows}</div>`,
+options: shuffle(fruits.map(f => f.name)),
+answer: ans,
+hint: '比较每一行的图案数量。'
+};
+}
+
+/* =========================================================
+三年级 题目生成器
+========================================================= */
+function gen3Num() {
+const t = pick(['place','value','compare','round','seq','word','expand']);
+if (t === 'place') {
+const n = rnd(1234, 9876);
+const s = String(n);
+const idxs = [0, 1, 2, 3].filter(i => s[i] !== '0');
+const i = pick(idxs);
+const names = ['千位', '百位', '十位', '个位'];
+return {
+q: `在 ${n} 中，数字 ${s[i]} 在什么数位？`,
+options: shuffle(names.slice()),
+answer: names[i],
+hint: '从右边开始：个位、十位、百位、千位。'
+};
+}
+if (t === 'value') {
+const n = rnd(1234, 9876);
+const s = String(n);
+const idxs = [0, 1, 2, 3].filter(i => s[i] !== '0');
+const i = pick(idxs);
+const d = +s[i];
+const vals = [1000, 100, 10, 1];
+const ans = d * vals[i];
+const pool = [d, d * 10, d * 100, d * 1000, vals[i], 1, 10, 100, 1000];
+return {
+q: `在 ${n} 中，数字 ${d} 的数值是多少？`,
+options: mixOptions(String(ans), pool, 4),
+answer: String(ans),
+hint: '看它在什么数位，就乘以那个数位的值。'
+};
+}
+if (t === 'compare') {
+const nums = [];
+while (nums.length < 3) { const v = rnd(1000, 9999); if (!nums.includes(v)) nums.push(v); }
+const max = Math.max(...nums);
+return {
+q: '下面哪个数最大？',
+options: shuffle(nums.map(String)),
+answer: String(max),
+hint: '先比千位，千位相同再比百位。'
+};
+}
+if (t === 'round') {
+const n = rnd(1250, 9800);
+const toHundred = Math.random() < 0.5;
+const ans = toHundred ? Math.round(n / 100) * 100 : Math.round(n / 1000) * 1000;
+const pool = [
+Math.floor(n / 100) * 100, Math.ceil(n / 100) * 100,
+Math.floor(n / 1000) * 1000, Math.ceil(n / 1000) * 1000,
+ans + 100, ans - 100, ans + 1000
+].filter(v => v >= 0 && v <= 10000);
+return {
+q: `把 ${n} 取整到最接近的${toHundred ? '百位' : '千位'}。`,
+options: mixOptions(String(ans), pool, 4),
+answer: String(ans),
+hint: '看下一位数字：4 或以下舍去，5 或以上进一。'
+};
+}
+if (t === 'seq') {
+const step = pick([10, 25, 50, 100, 200, 1000]);
+const maxStart = Math.max(step, 9000 - 3 * step);
+const start = rnd(1, Math.max(1, Math.floor(maxStart / step))) * step;
+const arr = [0, 1, 2, 3].map(i => start + i * step);
+const hide = pick([1, 2, 3]);
+const ans = arr[hide];
+const disp = arr.map((v, i) => i === hide ? '<span class="blank">?</span>' : v).join(' → ');
+return {
+q: '按规律填一填，问号是几？',
+visual: `<div class="seq">${disp}</div>`,
+options: numChoices(ans, 4, Math.max(10, Math.floor(step / 2))).map(String),
+answer: String(ans),
+hint: '看看相邻两个数相差多少。'
+};
+}
+if (t === 'word') {
+const n = rnd(1001, 9999);
+return {
+q: `“${cnNumBig(n)}”是多少？`,
+options: numChoices(n, 4, 400).map(String),
+answer: String(n),
+hint: '千位、百位、十位、个位，一位一位读出来。'
+};
+}
+const n = rnd(1001, 9999);
+const s = String(n);
+const parts = [1000, 100, 10, 1].map((v, i) => (+s[i]) * v).filter(v => v > 0);
+return {
+q: `${parts.join(' + ')} = ?`,
+options: numChoices(n, 4, 500).map(String),
+answer: String(n),
+hint: '把每个部分加起来。'
+};
+}
+
+function gen3AddSub() {
+const t = pick(['add','add','sub','sub','word']);
+if (t === 'add') {
+const a = rnd(500, 6000);
+const b = rnd(200, Math.max(300, 9900 - a));
+const ans = a + b;
+return {
+q: `${a} + ${b} = ?`,
+options: numChoices(ans, 4, 400).map(String),
+answer: String(ans),
+hint: '对齐数位，从个位开始加，满十进一。'
+};
+}
+if (t === 'sub') {
+const a = rnd(2000, 9900);
+const b = rnd(100, a - 500);
+const ans = a - b;
+return {
+q: `${a} − ${b} = ?`,
+options: numChoices(ans, 4, 400).map(String),
+answer: String(ans),
+hint: '对齐数位，从个位开始减，不够就向前借一。'
+};
+}
+if (Math.random() < 0.5) {
+const a = rnd(1000, 5000);
+const b = rnd(500, Math.max(600, 9900 - a));
+const ans = a + b;
+return {
+q: `图书馆原有 ${a} 本书，又买进了 ${b} 本。现在一共有多少本书？`,
+options: numChoices(ans, 4, 400).map(String),
+answer: String(ans),
+hint: '「又买进」表示变多了，用加法。'
+};
+}
+const a = rnd(3000, 9000);
+const b = rnd(500, a - 1000);
+const ans = a - b;
+return {
+q: `仓库里有 ${a} 包米，卖出了 ${b} 包。还剩多少包？`,
+options: numChoices(ans, 4, 400).map(String),
+answer: String(ans),
+hint: '「卖出」表示变少了，用减法。'
+};
+}
+
+function gen3MulDiv() {
+const t = pick(['mul2','mul2','mul3','div','div','word']);
+if (t === 'mul2') {
+const a = rnd(12, 49), b = rnd(2, 9);
+const ans = a * b;
+return {
+q: `${a} × ${b} = ?`,
+options: numChoices(ans, 4, Math.max(8, Math.round(ans * 0.2))).map(String),
+answer: String(ans),
+hint: '先算个位乘以 ' + b + '，再算十位乘以 ' + b + '，最后加起来。'
+};
+}
+if (t === 'mul3') {
+const a = rnd(101, 499), b = rnd(2, 5);
+const ans = a * b;
+return {
+q: `${a} × ${b} = ?`,
+options: numChoices(ans, 4, Math.max(20, Math.round(ans * 0.15))).map(String),
+answer: String(ans),
+hint: '一位一位乘，别忘了进位。'
+};
+}
+if (t === 'div') {
+const b = rnd(2, 9), q0 = rnd(11, 99);
+const a = b * q0;
+return {
+q: `${a} ÷ ${b} = ?`,
+options: numChoices(q0, 4, 8).map(String),
+answer: String(q0),
+hint: `想一想，几乘以 ${b} 等于 ${a}？`
+};
+}
+const b = rnd(3, 9), q0 = rnd(8, 40);
+const a = b * q0;
+return {
+q: `把 ${a} 粒糖果平均分给 ${b} 个小朋友，每人分到几粒？`,
+options: numChoices(q0, 4, 6).map(String),
+answer: String(q0),
+hint: '「平均分」就是用除法。'
+};
+}
+
+function gen3Mix() {
+const t = pick(['a+bc','(a+b)c','ab-c','(a+b)/c']);
+if (t === 'a+bc') {
+const a = rnd(2, 40), b = rnd(2, 9), c = rnd(2, 9);
+const ans = a + b * c;
+return {
+q: `${a} + ${b} × ${c} = ?`,
+options: numChoices(ans, 4, 8).map(String),
+answer: String(ans),
+hint: '先乘除，后加减。先算 ' + b + ' × ' + c + '。'
+};
+}
+if (t === '(a+b)c') {
+const a = rnd(3, 20), b = rnd(3, 20), c = rnd(2, 6);
+const ans = (a + b) * c;
+return {
+q: `(${a} + ${b}) × ${c} = ?`,
+options: numChoices(ans, 4, 10).map(String),
+answer: String(ans),
+hint: '有括号，先算括号里面的。'
+};
+}
+if (t === 'ab-c') {
+const a = rnd(3, 9), b = rnd(3, 9), c = rnd(2, 20);
+const ans = a * b - c;
+return {
+q: `${a} × ${b} − ${c} = ?`,
+options: numChoices(ans, 4, 8).map(String),
+answer: String(ans),
+hint: '先算乘法，再算减法。'
+};
+}
+const c = rnd(2, 9), k = rnd(4, 20);
+const a = rnd(2, k * c - 2);
+const b = k * c - a;
+const ans = k;
+return {
+q: `(${a} + ${b}) ÷ ${c} = ?`,
+options: numChoices(ans, 4, 5).map(String),
+answer: String(ans),
+hint: '先算括号里面的和，再除以 ' + c + '。'
+};
+}
+
+function gen3Frac() {
+const t = pick(['equiv','compare','add','sub','word']);
+if (t === 'equiv') {
+const den = pick([2, 3, 4, 5]);
+const mult = pick([2, 3]);
+const newDen = den * mult;
+const newNum = 1 * mult;
+return {
+q: `1/${den} = ?/${newDen}`,
+options: mixOptions(String(newNum), [String(newNum + 1), String(newNum - 1), String(newDen), String(den)], 4),
+answer: String(newNum),
+hint: '分子和分母同时乘以相同的数，分数大小不变。'
+};
+}
+if (t === 'compare') {
+const den = rnd(3, 10);
+let n1 = rnd(1, den - 1), n2 = rnd(1, den - 1);
+let guard = 0;
+while (n2 === n1 && guard++ < 30) n2 = rnd(1, den - 1);
+if (n2 === n1) n2 = n1 === 1 ? 2 : 1;
+const a = `${n1}/${den}`, b = `${n2}/${den}`;
+const ans = n1 > n2 ? a : b;
+return {
+q: `下面哪个分数比较大：${a} 还是 ${b}？`,
+options: shuffle([a, b]),
+answer: ans,
+hint: '分母相同，分子大的分数就大。'
+};
+}
+if (t === 'add') {
+const den = rnd(5, 12);
+const n1 = rnd(1, den - 3);
+const n2 = rnd(1, den - 1 - n1);
+const ansNum = n1 + n2;
+const ans = `${ansNum}/${den}`;
+const pool = [`${ansNum}/${den * 2}`, `${n1 + n2 + 1}/${den}`, `${Math.abs(n1 - n2)}/${den}`, `${n1 * n2}/${den}`];
+return {
+q: `${n1}/${den} + ${n2}/${den} = ?`,
+options: mixOptions(ans, pool, 4),
+answer: ans,
+hint: '分母不变，分子相加。'
+};
+}
+if (t === 'sub') {
+const den = rnd(5, 12);
+const n1 = rnd(3, den - 1);
+const n2 = rnd(1, n1 - 1);
+const ansNum = n1 - n2;
+const ans = `${ansNum}/${den}`;
+const pool = [`${ansNum + 1}/${den}`, `${n1 + n2}/${den}`, `${ansNum}/${den * 2}`, `${Math.max(1, ansNum - 1)}/${den}`];
+return {
+q: `${n1}/${den} − ${n2}/${den} = ?`,
+options: mixOptions(ans, pool, 4),
+answer: ans,
+hint: '分母不变，分子相减。'
+};
+}
+const den = pick([4, 5, 6, 8, 10]);
+const eaten = rnd(1, den - 1);
+const ans = `${eaten}/${den}`;
+const pool = [`${eaten}/${den + eaten}`, `${den - eaten}/${den}`, `${eaten + 1}/${den}`, `${eaten}/${den * 2}`];
+return {
+q: `一个蛋糕平均切成 ${den} 份，吃了 ${eaten} 份。吃了整个蛋糕的几分之几？`,
+visual: `<div class="frac-bar">${Array.from({ length: den }, (_, i) => `<div class="seg${i < eaten ? ' filled' : ''}"></div>`).join('')}</div>`,
+options: mixOptions(ans, pool, 4),
+answer: ans,
+hint: '吃了的份数写在上面（分子），总份数写在下面（分母）。'
+};
+}
+
+function gen3Dec() {
+const t = pick(['add','sub','compare','place']);
+if (t === 'add') {
+const A = rnd(10, 90), B = rnd(10, 90);
+const ansT = A + B;
+return {
+q: `${(A / 10).toFixed(1)} + ${(B / 10).toFixed(1)} = ?`,
+options: decChoices(ansT, 4, 15),
+answer: (ansT / 10).toFixed(1),
+hint: '小数点对齐，再按整数加法计算。'
+};
+}
+if (t === 'sub') {
+const A = rnd(30, 95), B = rnd(5, A - 10);
+const ansT = A - B;
+return {
+q: `${(A / 10).toFixed(1)} − ${(B / 10).toFixed(1)} = ?`,
+options: decChoices(ansT, 4, 12),
+answer: (ansT / 10).toFixed(1),
+hint: '小数点对齐，再按整数减法计算。'
+};
+}
+if (t === 'compare') {
+const a = rnd(1, 9), b = rnd(1, 9);
+if (a === b) return gen3Dec();
+const s1 = `0.${a}`, s2 = `0.${b}`;
+const ans = a > b ? s1 : s2;
+return {
+q: `下面哪个数比较大：${s1} 还是 ${s2}？`,
+options: shuffle([s1, s2]),
+answer: ans,
+hint: '整数部分相同，就看小数部分，大的那个数就大。'
+};
+}
+const tenths = rnd(1, 9);
+const hundredths = rnd(1, 9);
+const num = 1 + tenths / 10 + hundredths / 100;
+const q = `在 ${num.toFixed(2)} 中，数字 ${hundredths} 的数值是多少？`;
+const ans = (hundredths / 100).toFixed(2);
+const pool = [`${(hundredths / 10).toFixed(2)}`, String(hundredths), `${(hundredths / 1000).toFixed(3)}`, `${(tenths / 10).toFixed(2)}`];
+return {
+q, options: mixOptions(ans, pool, 4), answer: ans,
+hint: '小数点后第一位是十分位，第二位是百分位。'
+};
+}
+
+function gen3Money() {
+const t = pick(['add','add','change','mul','div']);
+if (t === 'add') {
+const A = rnd(150, 4500), B = rnd(150, 4500);
+const ans = A + B;
+return {
+q: `${rm(A)} + ${rm(B)} = ?`,
+options: moneyChoices(ans, 4, 250),
+answer: rm(ans),
+hint: '小数点对齐，也就是「仙」对齐。'
+};
+}
+if (t === 'change') {
+const pay = pick([1000, 2000, 5000, 10000]);
+const cost = rnd(150, pay - 100);
+const ans = pay - cost;
+return {
+q: `小华用 ${rm(pay)} 买了一个 ${rm(cost)} 的书包。应找回多少钱？`,
+options: moneyChoices(ans, 4, 200),
+answer: rm(ans),
+hint: '找回的钱 = 付的钱 − 物品的价钱。'
+};
+}
+if (t === 'mul') {
+const price = rnd(120, 890);
+const qty = rnd(2, 6);
+const ans = price * qty;
+return {
+q: `一本书 ${rm(price)}，买 ${qty} 本一共要多少钱？`,
+options: moneyChoices(ans, 4, 250),
+answer: rm(ans),
+hint: '每本一样价钱，用乘法。'
+};
+}
+const per = rnd(200, 1500);
+const people = rnd(2, 6);
+const total = per * people;
+return {
+q: `${rm(total)} 平均分给 ${people} 个人，每人分到多少钱？`,
+options: moneyChoices(per, 4, 150),
+answer: rm(per),
+hint: '平均分就是用除法。'
+};
+}
+
+function timeFmt(totalMin) {
+let h = Math.floor(totalMin / 60) % 12;
+if (h === 0) h = 12;
+const m = totalMin % 60;
+return `${h}:${String(m).padStart(2, '0')}`;
+}
+function timeChoices(totalMin, n = 4) {
+const set = new Set([timeFmt(totalMin)]);
+let guard = 0;
+while (set.size < n && guard++ < 120) {
+const d = pick([5, 10, 15, 20, 30]);
+const v = totalMin + (Math.random() < 0.5 ? -d : d);
+if (v > 0) set.add(timeFmt(v));
+}
+let v = totalMin + 60;
+while (set.size < n) { set.add(timeFmt(v)); v += 60; }
+return shuffle([...set]);
+}
+function gen3Time() {
+const t = pick(['convert','convert','add','dur']);
+if (t === 'convert') {
+const h = rnd(1, 5), m = pick([0, 15, 30, 45]);
+const total = h * 60 + m;
+return {
+q: `${h} 小时${m ? ' ' + m + ' 分钟' : ''} = ? 分钟`,
+options: numChoices(total, 4, 30).map(String),
+answer: String(total),
+hint: '1 小时 = 60 分钟。'
+};
+}
+if (t === 'add') {
+const h = rnd(1, 11);
+const m = pick([5, 10, 15, 20, 25, 30, 35, 40, 45, 50]);
+const add = pick([10, 15, 20, 25, 30, 40, 45, 50]);
+const total = h * 60 + m + add;
+return {
+q: `${timeFmt(h * 60 + m)} 再过 ${add} 分钟是几点？`,
+options: timeChoices(total, 4),
+answer: timeFmt(total),
+hint: '分钟加分钟，满 60 分钟就进 1 小时。'
+};
+}
+const startH = rnd(1, 10), startM = pick([0, 15, 30, 45]);
+const dur = pick([30, 45, 60, 75, 90, 120]);
+const total = startH * 60 + startM + dur;
+return {
+q: `从 ${timeFmt(startH * 60 + startM)} 到 ${timeFmt(total)}，经过了多长时间？`,
+options: shuffle([`${dur} 分钟`, `${dur + 15} 分钟`, `${Math.max(10, dur - 15)} 分钟`, `${dur + 30} 分钟`]),
+answer: `${dur} 分钟`,
+hint: '结束时间 − 开始时间 = 经过的时间。'
+};
+}
+
+function gen3Measure() {
+const t = pick(['km','m','m','kg','l','mix']);
+if (t === 'km') {
+const n = rnd(2, 9);
+return {
+q: `${n} km = ? m`,
+options: numChoices(n * 1000, 4, 500).map(String),
+answer: String(n * 1000),
+hint: '1 km = 1000 m。'
+};
+}
+if (t === 'm') {
+const n = rnd(2, 9);
+return {
+q: `${n} m = ? cm`,
+options: numChoices(n * 100, 4, 50).map(String),
+answer: String(n * 100),
+hint: '1 m = 100 cm。'
+};
+}
+if (t === 'kg') {
+const n = rnd(2, 9);
+return {
+q: `${n} kg = ? g`,
+options: numChoices(n * 1000, 4, 500).map(String),
+answer: String(n * 1000),
+hint: '1 kg = 1000 g。'
+};
+}
+if (t === 'l') {
+const n = rnd(2, 9);
+return {
+q: `${n} l = ? ml`,
+options: numChoices(n * 1000, 4, 500).map(String),
+answer: String(n * 1000),
+hint: '1 l = 1000 ml。'
+};
+}
+const km = rnd(1, 4), m = rnd(100, 900);
+const ans = km * 1000 + m;
+return {
+q: `${km} km ${m} m = ? m`,
+options: numChoices(ans, 4, 300).map(String),
+answer: String(ans),
+hint: '先把 km 换成 m，再加上剩下的 m。'
+};
+}
+
+function gen3Space() {
+const t = pick(['peri','area','peri','area','solid']);
+if (t === 'peri') {
+const l = rnd(3, 15), w = rnd(2, 12);
+const ans = 2 * (l + w);
+return {
+q: `一个长方形的长是 ${l} cm，宽是 ${w} cm。它的周长是多少 cm？`,
+visual: `<svg viewBox="0 0 200 140" class="shape-svg" style="width:150px;height:105px">
+<rect x="20" y="25" width="160" height="90" rx="6" fill="#8ecae6" stroke="#0077b6" stroke-width="4"/>
+<text x="100" y="18" text-anchor="middle" font-size="18" font-weight="900" fill="#0077b6">${l} cm</text>
+</svg>`,
+options: numChoices(ans, 4, 6).map(String),
+answer: String(ans),
+hint: '长方形周长 = (长 + 宽) × 2'
+};
+}
+if (t === 'area') {
+const l = rnd(3, 12), w = rnd(2, 10);
+const ans = l * w;
+return {
+q: `一个长方形的长是 ${l} cm，宽是 ${w} cm。它的面积是多少 cm²？`,
+visual: `<svg viewBox="0 0 200 140" class="shape-svg" style="width:150px;height:105px">
+<rect x="20" y="25" width="160" height="90" rx="6" fill="#b5e48c" stroke="#3a7d1e" stroke-width="4"/>
+</svg>`,
+options: numChoices(ans, 4, 8).map(String),
+answer: String(ans),
+hint: '长方形面积 = 长 × 宽'
+};
+}
+const qs = [
+{ q: '正方体有几个面？', a: '6 个', pool: ['4 个', '8 个', '12 个'] },
+{ q: '正方体有几条棱？', a: '12 条', pool: ['6 条', '8 条', '10 条'] },
+{ q: '正方体有几个顶点？', a: '8 个', pool: ['4 个', '6 个', '12 个'] },
+{ q: '正方形有几条边？', a: '4 条', pool: ['3 条', '5 条', '6 条'] },
+{ q: '三角形有几个角？', a: '3 个', pool: ['2 个', '4 个', '5 个'] }
+];
+const item = pick(qs);
+return {
+q: item.q,
+options: shuffle([item.a, ...item.pool]),
+answer: item.a,
+hint: '在脑海里想象一下这个图形。'
+};
+}
+
+function gen3Data() {
+const fruits = shuffle([
+{ e: '🍎', name: '苹果', n: rnd(2, 6) },
+{ e: '🍌', name: '香蕉', n: rnd(2, 6) },
+{ e: '🍇', name: '葡萄', n: rnd(2, 6) }
+]);
+const scale = pick([1, 1, 2]);
+const rows = fruits.map(f =>
+`<div class="picto-row"><span class="picto-label">${f.name}</span><span class="picto-icons">${f.e.repeat(f.n)}</span></div>`
+).join('');
+const note = scale === 2 ? `<div class="picto-note">每个图案代表 2 个</div>` : '';
+const t = pick(['count','most','least','total']);
+if (t === 'count') {
+const f = pick(fruits);
+const ans = f.n * scale;
+return {
+q: `${f.name}有多少个？`,
+visual: `<div class="picto">${rows}${note}</div>`,
+options: numChoices(ans, 4, Math.max(2, scale * 2)).map(String),
+answer: String(ans),
+hint: scale === 2 ? '每个图案代表 2 个，数一数有几个图案再乘以 2。' : '数一数那一行的图案数量。'
+};
+}
+if (t === 'total') {
+const ans = fruits.reduce((s, f) => s + f.n * scale, 0);
+return {
+q: '三种水果一共有多少个？',
+visual: `<div class="picto">${rows}${note}</div>`,
+options: numChoices(ans, 4, Math.max(3, scale * 3)).map(String),
+answer: String(ans),
+hint: '把三种水果的数量加起来。'
+};
+}
+const sorted = fruits.slice().sort((a, b) => b.n - a.n);
+const askMost = t === 'most';
+const ans = askMost ? sorted[0].name : sorted[sorted.length - 1].name;
+return {
+q: askMost ? '哪一种水果最多？' : '哪一种水果最少？',
+visual: `<div class="picto">${rows}${note}</div>`,
+options: shuffle(fruits.map(f => f.name)),
+answer: ans,
+hint: '比较每一行的图案数量。'
+};
+}
+
+/* =========================================================
+主题配置
+========================================================= */
+const TOPICS = {
+1: [
+{ id: 'num', icon: '🔢', name: '认识数字', desc: '1 到 100 数一数、比大小', gen: gen1Num },
+{ id: 'addsub', icon: '➕', name: '加减法', desc: '100 以内的加与减', gen: gen1AddSub },
+{ id: 'mul', icon: '✖️', name: '乘法', desc: '2、3、4、5、10 的乘法', gen: gen1Mul },
+{ id: 'frac', icon: '🍕', name: '分数', desc: '一半、四分之一', gen: gen1Frac },
+{ id: 'money', icon: '💰', name: '钱币', desc: '仙和令吉', gen: gen1Money },
+{ id: 'time', icon: '🕐', name: '时间', desc: '看时钟、认时间', gen: gen1Time },
+{ id: 'measure', icon: '📏', name: '度量', desc: '长、短、轻、重、多少', gen: gen1Measure },
+{ id: 'shape', icon: '🔷', name: '图形', desc: '认识各种形状', gen: gen1Shape },
+{ id: 'data', icon: '📊', name: '统计', desc: '看图数一数', gen: gen1Data }
+],
+3: [
+{ id: 'num', icon: '🔢', name: '整数', desc: '10000 以内、数位、近似值', gen: gen3Num },
+{ id: 'addsub', icon: '➕', name: '加减法', desc: '万以内的加与减', gen: gen3AddSub },
+{ id: 'muldiv', icon: '✖️', name: '乘除法', desc: '乘法与除法计算', gen: gen3MulDiv },
+{ id: 'mix', icon: '🧮', name: '混合运算', desc: '先乘除后加减', gen: gen3Mix },
+{ id: 'frac', icon: '🍕', name: '分数', desc: '等值分数、分数加减', gen: gen3Frac },
+{ id: 'dec', icon: '💧', name: '小数', desc: '小数的加减与比较', gen: gen3Dec },
+{ id: 'money', icon: '💰', name: '钱币', desc: '令吉的计算', gen: gen3Money },
+{ id: 'time', icon: '🕐', name: '时间', desc: '时间换算与计算', gen: gen3Time },
+{ id: 'measure', icon: '📏', name: '度量', desc: '长度、质量、体积换算', gen: gen3Measure },
+{ id: 'space', icon: '🔷', name: '空间', desc: '周长与面积', gen: gen3Space },
+{ id: 'data', icon: '📊', name: '统计', desc: '象形图与统计', gen: gen3Data }
+]
+};
+
+/* =========================================================
+音频
+========================================================= */
+let actx = null;
+function ensureAudio() {
+if (!actx) {
+try { actx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { actx = null; }
+}
+if (actx && actx.state === 'suspended') actx.resume();
+}
+function tone(freq, start, dur, type = 'sine', vol = 0.13) {
+if (!actx) return;
+try {
+const o = actx.createOscillator(), g = actx.createGain();
+o.type = type;
+o.frequency.value = freq;
+const t0 = actx.currentTime + start;
+g.gain.setValueAtTime(0.0001, t0);
+g.gain.linearRampToValueAtTime(vol, t0 + 0.012);
+g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+o.connect(g); g.connect(actx.destination);
+o.start(t0); o.stop(t0 + dur + 0.03);
+} catch (e) {}
+}
+function playCorrect() { ensureAudio(); tone(523, 0, .12); tone(659, .1, .12); tone(784, .2, .22); }
+function playWrong() { ensureAudio(); tone(220, 0, .16, 'square', .09); tone(165, .13, .26, 'square', .09); }
+function playClick() { ensureAudio(); tone(620, 0, .06, 'sine', .07); }
+function playWin() { ensureAudio(); [523, 659, 784, 1046].forEach((f, i) => tone(f, i * 0.12, .28)); }
+
+/* =========================================================
+状态与渲染
+========================================================= */
+const app = document.getElementById('app');
+const state = {
+screen: 'home',
+grade: null,
+topic: null,
+questions: [],
+idx: 0,
+score: 0,
+streak: 0,
+correctCount: 0,
+answered: false
+};
+const TOTAL_Q = 10;
+
+function buildQ(o) {
+let opts = [...new Set(o.options.map(String))];
+const ans = String(o.answer);
+if (!opts.includes(ans)) opts.push(ans);
+let guard = 0;
+while (opts.length < 4 && guard++ < 40) {
+const v = String(rnd(1, 99));
+if (!opts.includes(v)) opts.push(v);
+}
+return {
+q: o.q,
+visual: o.visual || '',
+hint: o.hint || '',
+answer: ans,
+options: shuffle(opts)
+};
+}
+
+function render() {
+if (state.screen === 'home') renderHome();
+else if (state.screen === 'topics') renderTopics();
+else if (state.screen === 'play') renderPlay();
+else if (state.screen === 'result') renderResult();
+}
+
+/* ---------- 主页 ---------- */
+function renderHome() {
+app.innerHTML = `
+<div class="screen home">
+<div class="mascot">🦉</div>
+<h1 class="title">数学大冒险</h1>
+<p class="subtitle">华小数学 · 快乐学习</p>
+<div class="grade-cards">
+<button class="grade-card g1" data-grade="1">
+<div class="gc-icon">1️⃣</div>
+<div class="gc-name">一年级</div>
+<div class="gc-desc">7 岁 · 基础数学</div>
+</button>
+<button class="grade-card g3" data-grade="3">
+<div class="gc-icon">3️⃣</div>
+<div class="gc-name">三年级</div>
+<div class="gc-desc">9 岁 · 进阶数学</div>
+</button>
+</div>
+</div>`;
+app.querySelectorAll('[data-grade]').forEach(btn => {
+btn.onclick = () => {
+playClick();
+state.grade = +btn.dataset.grade;
+state.screen = 'topics';
+render();
+};
+});
+}
+
+/* ---------- 主题选择 ---------- */
+function renderTopics() {
+const topics = TOPICS[state.grade];
+const cards = topics.map(t => `
+<button class="topic-card" data-topic="${t.id}">
+<div class="tc-icon">${t.icon}</div>
+<div class="tc-name">${t.name}</div>
+<div class="tc-desc">${t.desc}</div>
+</button>`).join('');
+
+app.innerHTML = `
+<div class="screen topics">
+<div class="topbar">
+<button class="icon-btn" id="btnHome">←</button>
+<div class="topbar-title">${state.grade === 1 ? '一年级' : '三年级'} · 选择主题</div>
+<div style="width:46px"></div>
+</div>
+<div class="topic-grid">${cards}</div>
+</div>`;
+
+document.getElementById('btnHome').onclick = () => {
+playClick();
+state.screen = 'home';
+render();
+};
+app.querySelectorAll('[data-topic]').forEach(btn => {
+btn.onclick = () => {
+playClick();
+const topic = topics.find(t => t.id === btn.dataset.topic);
+startGame(topic);
+};
+});
+}
+
+/* ---------- 开始游戏 ---------- */
+function startGame(topic) {
+state.topic = topic;
+state.questions = [];
+for (let i = 0; i < TOTAL_Q; i++) {
+let q = null, guard = 0;
+while (!q && guard++ < 12) {
+try { q = buildQ(topic.gen()); } catch (e) { q = null; }
+}
+if (!q) {
+q = buildQ({
+q: '1 + 1 = ?', options: ['1', '2', '3', '4'], answer: '2', hint: '很简单吧！'
+});
+}
+state.questions.push(q);
+}
+state.idx = 0;
+state.score = 0;
+state.streak = 0;
+state.correctCount = 0;
+state.answered = false;
+state.screen = 'play';
+render();
+}
+
+/* ---------- 游戏界面 ---------- */
+function renderPlay() {
+app.innerHTML = `
+<div class="screen play">
+<div class="topbar">
+<button class="icon-btn" id="btnBack">←</button>
+<div class="progress-wrap">
+<div class="progress"><div class="progress-fill" id="progFill"></div></div>
+<div class="progress-text" id="progText">1 / ${TOTAL_Q}</div>
+</div>
+<div class="score-badge" id="scoreBadge">⭐ 0</div>
+</div>
+<div class="qarea" id="qarea"></div>
+</div>`;
+
+document.getElementById('btnBack').onclick = () => {
+playClick();
+state.screen = 'topics';
+render();
+};
+showQuestion();
+}
+
+function updateProgress() {
+const fill = document.getElementById('progFill');
+const text = document.getElementById('progText');
+if (fill) fill.style.width = ((state.idx) / TOTAL_Q * 100) + '%';
+if (text) text.textContent = `${Math.min(state.idx + 1, TOTAL_Q)} / ${TOTAL_Q}`;
+}
+
+function showQuestion() {
+const q = state.questions[state.idx];
+state.answered = false;
+const area = document.getElementById('qarea');
+const keys = ['A', 'B', 'C', 'D', 'E', 'F'];
+
+area.innerHTML = `
+<div class="qcard pop">
+<div class="qtext">${q.q}</div>
+${q.visual ? `<div class="qvisual">${q.visual}</div>` : ''}
+</div>
+<div class="options" id="options"></div>`;
+
+const optsEl = document.getElementById('options');
+q.options.forEach((opt, i) => {
+const b = document.createElement('button');
+b.className = 'opt';
+b.style.animationDelay = (i * 0.055) + 's';
+b.dataset.opt = String(opt);
+b.innerHTML = `<span class="opt-key">${keys[i] || (i + 1)}</span><span class="opt-val">${opt}</span>`;
+b.onclick = () => handleAnswer(opt, b);
+optsEl.appendChild(b);
+});
+
+updateProgress();
+const badge = document.getElementById('scoreBadge');
+if (badge) badge.textContent = '⭐ ' + state.score;
+}
+
+function handleAnswer(opt, btn) {
+if (state.answered) return;
+state.answered = true;
+
+const q = state.questions[state.idx];
+const isRight = String(opt) === String(q.answer);
+const buttons = [...document.querySelectorAll('.opt')];
+buttons.forEach(b => b.classList.add('disabled'));
+const correctBtn = buttons.find(b => b.dataset.opt === String(q.answer));
+
+if (isRight) {
+btn.classList.add('correct');
+state.correctCount++;
+state.streak++;
+const gain = 10 + Math.min(state.streak - 1, 5) * 2;
+state.score += gain;
+const badge = document.getElementById('scoreBadge');
+if (badge) badge.textContent = '⭐ ' + state.score;
+
+playCorrect();
+burstConfetti(btn);
+
+const praise = ['太棒了！', '答对了！', '好厉害！', '真聪明！', '继续加油！', '好样的！'];
+let msg = pick(praise);
+if (state.streak >= 3) msg += ` 连对 ${state.streak} 题！🔥`;
+showToast(msg);
+
+setTimeout(nextQuestion, 1050);
+} else {
+btn.classList.add('wrong');
+if (correctBtn) correctBtn.classList.add('correct');
+state.streak = 0;
+playWrong();
+
+const area = document.getElementById('qarea');
+const hintBox = document.createElement('div');
+hintBox.className = 'hint-box';
+hintBox.innerHTML = `💡 <b>正确答案：</b>${q.answer}<br>${q.hint || '再想一想，下次一定可以！'}`;
+area.appendChild(hintBox);
+
+const cont = document.createElement('button');
+cont.className = 'continue-btn';
+cont.textContent = '我明白了，继续 →';
+cont.onclick = () => { playClick(); nextQuestion(); };
+area.appendChild(cont);
+}
+}
+
+function nextQuestion() {
+state.idx++;
+if (state.idx >= state.questions.length) {
+state.screen = 'result';
+render();
+return;
+}
+showQuestion();
+}
+
+/* ---------- 结果 ---------- */
+function renderResult() {
+const total = state.questions.length;
+const acc = state.correctCount / total;
+const stars = acc >= 0.9 ? 3 : acc >= 0.7 ? 2 : acc >= 0.5 ? 1 : 0;
+const starStr = [0, 1, 2].map(i => `<span class="${i < stars ? '' : 'off'}">⭐</span>`).join('');
+
+let emoji = '🦉', title = '继续努力！';
+if (stars === 3) { emoji = '🏆'; title = '完美通关！'; }
+else if (stars === 2) { emoji = '🎉'; title = '很棒哦！'; }
+else if (stars === 1) { emoji = '💪'; title = '还不错！'; }
+
+if (stars >= 2) playWin(); else playClick();
+
+app.innerHTML = `
+<div class="screen result">
+<div class="result-emoji">${emoji}</div>
+<h2 class="result-title">${title}</h2>
+<div class="stars">${starStr}</div>
+<div class="stat-row">
+<div class="stat"><div class="stat-num">${state.score}</div><div class="stat-lbl">总得分</div></div>
+<div class="stat"><div class="stat-num">${state.correctCount}/${total}</div><div class="stat-lbl">答对题数</div></div>
+<div class="stat"><div class="stat-num">${Math.round(acc * 100)}%</div><div class="stat-lbl">正确率</div></div>
+</div>
+<div class="btn-row">
+<button class="big-btn primary" id="btnAgain">再玩一次</button>
+<button class="big-btn ghost" id="btnTopics">换个主题</button>
+</div>
+</div>`;
+
+document.getElementById('btnAgain').onclick = () => {
+playClick();
+startGame(state.topic);
+};
+document.getElementById('btnTopics').onclick = () => {
+playClick();
+state.screen = 'topics';
+render();
+};
+}
+
+/* ---------- 特效 ---------- */
+function burstConfetti(el) {
+const rect = el.getBoundingClientRect();
+const colors = ['#ffd166', '#ff5c8a', '#4cc9f0', '#b5e48c', '#f72585', '#7209b7', '#fff'];
+for (let i = 0; i < 18; i++) {
+const p = document.createElement('div');
+p.className = 'confetti';
+p.style.left = (rect.left + rect.width / 2) + 'px';
+p.style.top = (rect.top + rect.height / 2) + 'px';
+p.style.background = pick(colors);
+const ang = Math.random() * Math.PI * 2;
+const dist = 60 + Math.random() * 130;
+p.style.setProperty('--tx', (Math.cos(ang) * dist).toFixed(0) + 'px');
+p.style.setProperty('--ty', (Math.sin(ang) * dist + 90).toFixed(0) + 'px');
+p.style.setProperty('--rot', (Math.random() * 720 - 360).toFixed(0) + 'deg');
+document.body.appendChild(p);
+setTimeout(() => p.remove(), 1000);
+}
+}
+function showToast(msg) {
+const t = document.createElement('div');
+t.className = 'toast';
+t.textContent = msg;
+document.body.appendChild(t);
+setTimeout(() => t.remove(), 1500);
+}
+
+/* ---------- 初始化 ---------- */
+document.addEventListener('pointerdown', ensureAudio, { once: true });
+render();
+</script>
+</body>
+</html>
+```
